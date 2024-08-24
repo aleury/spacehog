@@ -78,6 +78,60 @@ mod test {
     use super::{list_entries, prettify_bytes, Entry};
 
     #[test]
+    fn list_entries_returns_all_files_under_the_given_path_in_descending_order() {
+        let want = vec![
+            Entry::new("./testdata/en/world.txt", 7),
+            Entry::new("./testdata/es/mundo.txt", 6),
+            Entry::new("./testdata/en/hello.txt", 6),
+            Entry::new("./testdata/es/hola.txt", 5),
+        ];
+        let got = list_entries("./testdata").unwrap();
+        assert_eq!(want, got);
+    }
+
+    #[test]
+    fn entry_can_be_formatted_as_a_string() {
+        struct Case {
+            entry: Entry,
+            want: &'static str,
+        }
+        let cases = vec![
+            Case {
+                entry: Entry::new("/path/to/file.txt", 1000),
+                want: "  1 Kb: /path/to/file.txt",
+            },
+            Case {
+                entry: Entry::new("/path/to/file.txt", 34250),
+                want: " 34 Kb: /path/to/file.txt",
+            },
+        ];
+        for case in cases {
+            let got = case.entry.to_string();
+            assert_eq!(case.want, got);
+        }
+    }
+
+    #[test]
+    fn entries_can_be_sorted_in_descending_order() {
+        let mut entries = vec![
+            Entry::new("/path/to/a.txt", 20),
+            Entry::new("/path/to/b.txt", 10),
+            Entry::new("/path/to/d.txt", 10),
+            Entry::new("/path/to/c.txt", 30),
+        ];
+
+        let want = vec![
+            Entry::new("/path/to/c.txt", 30),
+            Entry::new("/path/to/a.txt", 20),
+            Entry::new("/path/to/d.txt", 10),
+            Entry::new("/path/to/b.txt", 10),
+        ];
+        entries.sort_by(|a, b| b.cmp(a));
+
+        assert_eq!(want, entries);
+    }
+
+    #[test]
     fn prettify_bytes_formats_a_number_of_bytes_as_human_readable_text() {
         struct Case {
             size: u64,
@@ -125,59 +179,5 @@ mod test {
             let got = prettify_bytes(case.size);
             assert_eq!(case.want.to_string(), got);
         }
-    }
-
-    #[test]
-    fn entry_can_be_formatted_as_a_string() {
-        struct Case {
-            entry: Entry,
-            want: &'static str,
-        }
-        let cases = vec![
-            Case {
-                entry: Entry::new("/path/to/file.txt", 1000),
-                want: "  1 Kb: /path/to/file.txt",
-            },
-            Case {
-                entry: Entry::new("/path/to/file.txt", 34250),
-                want: " 34 Kb: /path/to/file.txt",
-            },
-        ];
-        for case in cases {
-            let got = case.entry.to_string();
-            assert_eq!(case.want, got);
-        }
-    }
-
-    #[test]
-    fn entries_can_be_sorted_in_descending_order() {
-        let mut entries = vec![
-            Entry::new("/path/to/a.txt", 20),
-            Entry::new("/path/to/b.txt", 10),
-            Entry::new("/path/to/d.txt", 10),
-            Entry::new("/path/to/c.txt", 30),
-        ];
-
-        let want = vec![
-            Entry::new("/path/to/c.txt", 30),
-            Entry::new("/path/to/a.txt", 20),
-            Entry::new("/path/to/d.txt", 10),
-            Entry::new("/path/to/b.txt", 10),
-        ];
-        entries.sort_by(|a, b| b.cmp(a));
-
-        assert_eq!(want, entries);
-    }
-
-    #[test]
-    fn list_entries_returns_all_files_under_the_given_path_in_descending_order() {
-        let want = vec![
-            Entry::new("./testdata/en/world.txt", 7),
-            Entry::new("./testdata/es/mundo.txt", 6),
-            Entry::new("./testdata/en/hello.txt", 6),
-            Entry::new("./testdata/es/hola.txt", 5),
-        ];
-        let got = list_entries("./testdata").unwrap();
-        assert_eq!(want, got);
     }
 }
