@@ -3,7 +3,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub fn run(path: &str, n: usize) -> std::io::Result<()> {
+/// Prints the top `n` largest files under the provided path.
+///
+/// # Errors
+///
+/// Will return the I/O error if unable to scan the provided path.
+pub fn display_largest_files(path: &str, n: usize) -> std::io::Result<()> {
     let entries = list_entries(path)?;
     println!("*** Top {n} largest files ***");
     for entry in entries.iter().take(n) {
@@ -56,7 +61,7 @@ fn walk_dir(path: &Path, cb: &mut impl FnMut(Entry)) -> std::io::Result<()> {
             if path.is_dir() {
                 walk_dir(&path, cb)?;
             } else {
-                cb(Entry::new(entry.path(), entry.metadata()?.len()));
+                cb(Entry::new(path, entry.metadata()?.len()));
             }
         }
     }

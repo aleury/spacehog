@@ -11,5 +11,5 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    dstats::run(&args.path, args.number)
+    dstats::display_largest_files(&args.path, args.number)
 }
