@@ -64,7 +64,7 @@ fn walk_dir(path: &Path, cb: &mut impl FnMut(Entry)) -> std::io::Result<()> {
 }
 
 fn prettify_bytes(n: u64) -> String {
-    let units: Vec<&'static str> = vec!["B", "Kb", "Mb", "Gb", "Tb"];
+    let units = ["B", "Kb", "Mb", "Gb", "Tb"];
 
     let base = (n as f64).ln() / 1000f64.ln();
     let value = 1000f64.powf(base - base.floor());
