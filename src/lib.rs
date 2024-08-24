@@ -15,8 +15,8 @@ pub fn list_entries(path: &str) -> std::io::Result<Vec<Entry>> {
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Entry {
-    pub size: u64,
-    pub path: PathBuf,
+    size: u64,
+    path: PathBuf,
 }
 
 impl Entry {
