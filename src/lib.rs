@@ -31,8 +31,8 @@ pub struct Entry {
 impl Entry {
     pub fn new(path: impl Into<PathBuf>, size: u64) -> Self {
         Entry {
-            path: path.into(),
             size,
+            path: path.into(),
         }
     }
 }
