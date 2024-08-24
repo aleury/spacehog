@@ -3,7 +3,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub fn list_entries(path: &str) -> std::io::Result<Vec<Entry>> {
+pub fn run(path: &str, n: usize) -> std::io::Result<()> {
+    let entries = list_entries(path)?;
+    println!("*** Top {n} largest files ***");
+    for entry in entries.iter().take(n) {
+        println!("{entry}");
+    }
+    Ok(())
+}
+
+fn list_entries(path: &str) -> std::io::Result<Vec<Entry>> {
     let mut entries = Vec::new();
 
     walk_dir(Path::new(path), &mut |entry| entries.push(entry))?;

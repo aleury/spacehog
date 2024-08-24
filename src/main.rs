@@ -11,14 +11,5 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-
-    let n = args.number;
-    let entries = dstats::list_entries(&args.path)?;
-
-    println!("*** Top {n} largest files ***");
-    for entry in entries.iter().take(n) {
-        println!("{entry}");
-    }
-
-    Ok(())
+    dstats::run(&args.path, args.number)
 }
