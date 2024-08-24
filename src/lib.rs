@@ -1,3 +1,9 @@
+#![allow(
+    clippy::cast_sign_loss,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation
+)]
+
 use std::{
     fmt::Display,
     path::{Path, PathBuf},
