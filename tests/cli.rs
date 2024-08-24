@@ -40,7 +40,7 @@ fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
 fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_working_directory() {
     Command::cargo_bin("dstats")
         .unwrap()
-        .arg("-n=10")
+        .args(["-n", "10"])
         .assert()
         .success()
         .stdout(predicates::str::contains("*** Top 10 largest files ***"));
