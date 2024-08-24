@@ -1,3 +1,5 @@
+[![CI](https://github.com/aleury/dstats/actions/workflows/ci.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/ci.yml)
+
 # Usage
 
 ```sh
