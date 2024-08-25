@@ -9,7 +9,7 @@ use files::File;
 ///
 /// # Errors
 ///
-/// Will return the I/O error if unable to scan the provided path.
+/// Returns an I/O error if unable to scan the provided path.
 pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<File>> {
     Ok(files::list(path)?.into_iter().take(n).collect())
 }
