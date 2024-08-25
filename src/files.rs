@@ -1,24 +1,19 @@
-use std::{
-    fmt::Display,
-    path::{Path, PathBuf},
-};
+use std::fmt::Display;
+use std::fs::ReadDir;
+use std::io;
+use std::path::PathBuf;
 
 use humanize_bytes::humanize_bytes_decimal;
 
-pub fn list(path: &str) -> std::io::Result<Vec<File>> {
-    let mut files = Vec::new();
-
-    walk_dir(Path::new(path), &mut |file| files.push(file))?;
-
-    files.sort_by(|a, b| b.cmp(a));
-
-    Ok(files)
+pub fn from_path(path: &str) -> io::Result<FileIter> {
+    let dir = std::fs::read_dir(path)?;
+    Ok(FileIter { stack: vec![dir] })
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct File {
-    size: Size,
-    path: PathBuf,
+    pub size: Size,
+    pub path: PathBuf,
 }
 
 impl File {
@@ -45,36 +40,40 @@ impl Display for Size {
     }
 }
 
-fn walk_dir(path: &Path, cb: &mut impl FnMut(File)) -> std::io::Result<()> {
-    if path.is_dir() {
-        for entry in std::fs::read_dir(path)? {
-            let entry = entry?;
-            let path = entry.path();
-            if path.is_dir() {
-                walk_dir(&path, cb)?;
+pub struct FileIter {
+    stack: Vec<ReadDir>,
+}
+
+impl Iterator for FileIter {
+    type Item = File;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if let Some(dir) = self.stack.last_mut() {
+                // Explore the current directory.
+                if let Some(entry) = dir.next() {
+                    let entry = entry.ok()?;
+                    let path = entry.path();
+                    if path.is_dir() {
+                        self.stack.push(std::fs::read_dir(path).ok()?);
+                    } else {
+                        return Some(File::new(path, entry.metadata().ok()?.len()));
+                    }
+                } else {
+                    // No more entries in the current directory.
+                    self.stack.pop();
+                }
             } else {
-                cb(File::new(path, entry.metadata()?.len()));
+                // No more directories to explore.
+                return None;
             }
         }
     }
-    Ok(())
 }
 
 #[cfg(test)]
 mod test {
-    use super::{list, File};
-
-    #[test]
-    fn list_returns_all_files_under_the_given_path_in_descending_order() {
-        let want = vec![
-            File::new("./testdata/en/world.txt", 7),
-            File::new("./testdata/es/mundo.txt", 6),
-            File::new("./testdata/en/hello.txt", 6),
-            File::new("./testdata/es/hola.txt", 5),
-        ];
-        let got = list("./testdata").unwrap();
-        assert_eq!(want, got);
-    }
+    use super::{from_path, File};
 
     #[test]
     fn file_can_be_formatted_as_a_string() {
@@ -116,5 +115,17 @@ mod test {
         files.sort_by(|a, b| b.cmp(a));
 
         assert_eq!(want, files);
+    }
+
+    #[test]
+    fn from_path_returns_iterator_over_files_in_the_given_path() {
+        let want = vec![
+            File::new("./testdata/es/hola.txt", 5),
+            File::new("./testdata/es/mundo.txt", 6),
+            File::new("./testdata/en/world.txt", 7),
+            File::new("./testdata/en/hello.txt", 6),
+        ];
+        let got = from_path("./testdata").unwrap().collect::<Vec<_>>();
+        assert_eq!(want, got);
     }
 }

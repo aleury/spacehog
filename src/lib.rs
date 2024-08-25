@@ -10,5 +10,21 @@ use files::File;
 ///
 /// Returns an I/O error if unable to scan the provided path.
 pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<File>> {
-    Ok(files::list(path)?.into_iter().take(n).collect())
+    let mut results = Vec::with_capacity(n);
+
+    for file in files::from_path(path)? {
+        if let Some(smallest_file) = results.last() {
+            if file > *smallest_file {
+                results.push(file);
+                results.sort_by(|a, b| b.cmp(a));
+                if results.len() > n {
+                    results.pop();
+                }
+            }
+        } else {
+            results.push(file);
+        }
+    }
+
+    Ok(results)
 }
