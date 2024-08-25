@@ -1,4 +1,3 @@
-mod bytes;
 mod files;
 
 use std::io;

@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::bytes;
+use humanize_bytes::humanize_bytes_decimal;
 
 pub fn list(path: &str) -> std::io::Result<Vec<File>> {
     let mut files = Vec::new();
@@ -17,14 +17,14 @@ pub fn list(path: &str) -> std::io::Result<Vec<File>> {
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct File {
-    size: u64,
+    size: Size,
     path: PathBuf,
 }
 
 impl File {
     pub fn new(path: impl Into<PathBuf>, size: u64) -> Self {
         File {
-            size,
+            size: Size(size),
             path: path.into(),
         }
     }
@@ -32,12 +32,16 @@ impl File {
 
 impl Display for File {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{:>6}: {}",
-            bytes::prettify(self.size),
-            self.path.display()
-        )
+        write!(f, "{}: {}", self.size, self.path.display())
+    }
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub struct Size(u64);
+
+impl Display for Size {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:>8}", humanize_bytes_decimal!(self.0))
     }
 }
 
@@ -81,11 +85,11 @@ mod test {
         let cases = vec![
             Case {
                 file: File::new("/path/to/file.txt", 1000),
-                want: "  1 KB: /path/to/file.txt",
+                want: "    1 kB: /path/to/file.txt",
             },
             Case {
                 file: File::new("/path/to/file.txt", 34250),
-                want: " 34 KB: /path/to/file.txt",
+                want: " 34.2 kB: /path/to/file.txt",
             },
         ];
         for case in cases {

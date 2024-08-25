@@ -23,10 +23,10 @@ fn binary_with_no_args_prints_top_5_largest_files_under_working_directory() {
 fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
     let want = [
         "*** Top 5 largest files ***",
-        "   7 B: ./testdata/en/world.txt",
-        "   6 B: ./testdata/es/mundo.txt",
-        "   6 B: ./testdata/en/hello.txt",
-        "   5 B: ./testdata/es/hola.txt",
+        "     7 B: ./testdata/en/world.txt",
+        "     6 B: ./testdata/es/mundo.txt",
+        "     6 B: ./testdata/en/hello.txt",
+        "     5 B: ./testdata/es/hola.txt",
     ];
     Command::cargo_bin("dstats")
         .unwrap()
