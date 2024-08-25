@@ -12,8 +12,8 @@ pub fn from_path(path: &str) -> io::Result<FileIter> {
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct File {
-    pub size: Size,
-    pub path: PathBuf,
+    size: Size,
+    path: PathBuf,
 }
 
 impl File {
