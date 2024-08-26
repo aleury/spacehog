@@ -10,17 +10,23 @@ struct Args {
     number: usize,
 }
 
-fn main() -> std::io::Result<()> {
+fn main() {
     let args = Args::parse();
     let mut sp = Spinner::new(spinners::Dots, "Scanning files...", Color::Blue);
 
-    let results = dstats::find_top_n_largest_files(&args.path, args.number)?;
+    let results = dstats::find_top_n_largest_files(&args.path, args.number);
     sp.clear();
 
-    println!("*** Top {} largest files ***", args.number);
-    for file in results {
-        println!("{file}");
+    match results {
+        Ok(files) => {
+            println!("*** Top {} largest files ***", args.number);
+            for file in files {
+                println!("{file}");
+            }
+        }
+        Err(e) => {
+            eprintln!("{e}");
+            std::process::exit(1);
+        }
     }
-
-    Ok(())
 }
