@@ -34,4 +34,4 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: cargo install cargo-tarpaulin
-      - run: cargo tarpaulin --all-features
+      - run: cargo tarpaulin --all-features --engine llvm
