@@ -2,6 +2,16 @@
 [![Nightly](https://github.com/aleury/dstats/actions/workflows/nightly.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/nightly.yml)
 [![Audit](https://github.com/aleury/dstats/actions/workflows/audit.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/audit.yml)
 
+# Install
+
+```
+$ git clone git@github.com:aleury/dstats.git
+
+$ cd dstats
+
+$ cargo install --path .
+```
+
 # Usage
 
 ```
