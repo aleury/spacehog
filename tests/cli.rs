@@ -45,3 +45,13 @@ fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_w
         .success()
         .stdout(predicates::str::contains("*** Top 10 largest files ***"));
 }
+
+#[test]
+fn binary_with_invalid_path_arg_prints_an_error_message_and_exits_with_failure_code() {
+    Command::cargo_bin("dstats")
+        .unwrap()
+        .arg("nonexistent")
+        .assert()
+        .failure()
+        .stderr(predicates::str::contains("No such file or directory"));
+}

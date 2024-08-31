@@ -34,8 +34,4 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: cargo install cargo-tarpaulin
-      - run: cargo tarpaulin --all-features --out Xml
-      - uses: actions/upload-artifact@v2
-        with:
-          name: coverage
-          path: cobertura.xml
+      - run: cargo tarpaulin --all-features
