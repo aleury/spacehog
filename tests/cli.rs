@@ -1,6 +1,26 @@
 use assert_cmd::Command;
 
 #[test]
+fn binary_with_version_flag_prints_version() {
+    Command::cargo_bin("dstats")
+        .unwrap()
+        .arg("--version")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(env!("CARGO_PKG_VERSION")));
+}
+
+#[test]
+fn binary_with_help_flag_prints_description() {
+    Command::cargo_bin("dstats")
+        .unwrap()
+        .arg("--help")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(env!("CARGO_PKG_DESCRIPTION")));
+}
+
+#[test]
 fn binary_with_help_flag_prints_usage() {
     Command::cargo_bin("dstats")
         .unwrap()

@@ -2,6 +2,7 @@ use clap::Parser;
 use spinoff::{spinners, Color, Spinner};
 
 #[derive(Parser, Debug)]
+#[command(version, about)]
 struct Args {
     #[arg(default_value = ".")]
     path: String,
