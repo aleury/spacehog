@@ -2,9 +2,15 @@
 [![Nightly](https://github.com/aleury/dstats/actions/workflows/nightly.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/nightly.yml)
 [![Audit](https://github.com/aleury/dstats/actions/workflows/audit.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/audit.yml)
 
-# Install
+# Install with Cargo
 
+```sh
+$ cargo install dstats
 ```
+
+# Build from source
+
+```sh
 $ git clone git@github.com:aleury/dstats.git
 
 $ cd dstats
@@ -14,7 +20,7 @@ $ cargo install --path .
 
 # Usage
 
-```
+```sh
 $ dstats --help
 Usage: dstats [OPTIONS] [PATH]
 
