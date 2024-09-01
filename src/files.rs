@@ -127,7 +127,7 @@ mod test {
         ];
         let mut got = from_path("./testdata").unwrap().collect::<Vec<_>>();
         // Sort by path for consistent ordering.
-        got.sort_by_key(|f| f.path.to_owned());
+        got.sort_by_key(|f| f.path.clone());
         assert_eq!(want, got);
     }
 }
