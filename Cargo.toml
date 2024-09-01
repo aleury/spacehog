@@ -3,9 +3,7 @@ name = "dstats"
 version = "0.1.0"
 authors = ["Adam Eury <euryadam@gmail.com>"]
 edition = "2021"
-description = """
-A simple utility for finding large files on your system.
-"""
+description = """A simple utility for finding large files on your system."""
 keywords = ["disk", "space", "usage", "large", "files"]
 categories = ["command-line-utilities"]
 license = "MIT OR Apache-2.0"
