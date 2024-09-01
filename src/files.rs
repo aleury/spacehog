@@ -10,7 +10,7 @@ pub fn from_path(path: &str) -> io::Result<FileIter> {
     Ok(FileIter { stack: vec![dir] })
 }
 
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct File {
     size: Size,
     path: PathBuf,
