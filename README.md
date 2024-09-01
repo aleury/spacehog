@@ -4,13 +4,13 @@
 
 # Install with Cargo
 
-```sh
+```
 $ cargo install dstats
 ```
 
 # Build from source
 
-```sh
+```
 $ git clone git@github.com:aleury/dstats.git
 
 $ cd dstats
@@ -20,8 +20,9 @@ $ cargo install --path .
 
 # Usage
 
-```sh
-$ dstats --help
+```
+A simple utility for finding large files on your system.
+
 Usage: dstats [OPTIONS] [PATH]
 
 Arguments:
@@ -30,6 +31,7 @@ Arguments:
 Options:
   -n <NUMBER>      [default: 5]
   -h, --help       Print help
+  -V, --version    Print version
 ```
 
 ## Examples
