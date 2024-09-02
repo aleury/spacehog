@@ -1,19 +1,19 @@
-[![CI](https://github.com/aleury/dstats/actions/workflows/ci.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/ci.yml)
-[![Nightly](https://github.com/aleury/dstats/actions/workflows/nightly.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/nightly.yml)
-[![Audit](https://github.com/aleury/dstats/actions/workflows/audit.yml/badge.svg)](https://github.com/aleury/dstats/actions/workflows/audit.yml)
+[![CI](https://github.com/aleury/spacehog/actions/workflows/ci.yml/badge.svg)](https://github.com/aleury/spacehog/actions/workflows/ci.yml)
+[![Nightly](https://github.com/aleury/spacehog/actions/workflows/nightly.yml/badge.svg)](https://github.com/aleury/spacehog/actions/workflows/nightly.yml)
+[![Audit](https://github.com/aleury/spacehog/actions/workflows/audit.yml/badge.svg)](https://github.com/aleury/spacehog/actions/workflows/audit.yml)
 
 # Install with Cargo
 
 ```
-$ cargo install dstats
+$ cargo install spacehog
 ```
 
 # Build from source
 
 ```
-$ git clone git@github.com:aleury/dstats.git
+$ git clone git@github.com:aleury/spacehog.git
 
-$ cd dstats
+$ cd spacehog
 
 $ cargo install --path .
 ```
@@ -23,7 +23,7 @@ $ cargo install --path .
 ```
 A simple utility for finding large files on your system.
 
-Usage: dstats [OPTIONS] [PATH]
+Usage: spacehog [OPTIONS] [PATH]
 
 Arguments:
   [PATH]  [default: .]
@@ -38,11 +38,11 @@ Options:
 
 ```sh
 # View the top 5 largest files under the current directory
-$ dstats
+$ spacehog
 
 # View the top 10 largest files under the current directory
-$ dstats -n 10
+$ spacehog -n 10
 
 # View the top 10 largest files under the given path
-$ dstats ./stuff -n 10
+$ spacehog ./stuff -n 10
 ```

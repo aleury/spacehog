@@ -1,5 +1,5 @@
 [package]
-name = "dstats"
+name = "spacehog"
 version = "0.1.4"
 authors = ["Adam Eury <euryadam@gmail.com>"]
 edition = "2021"
@@ -8,9 +8,9 @@ keywords = ["disk", "space", "usage", "large", "files"]
 categories = ["command-line-utilities"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-documentation = "https://docs.rs/dstats"
-homepage = "https://github.com/aleury/dstats"
-repository = "https://github.com/aleury/dstats"
+documentation = "https://docs.rs/spacehog"
+homepage = "https://github.com/aleury/spacehog"
+repository = "https://github.com/aleury/spacehog"
 exclude = ["/.github/"]
 
 [dependencies]
