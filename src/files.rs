@@ -73,8 +73,8 @@ impl Iterator for FileIter {
 
 #[cfg(test)]
 mod test {
-    use std::path::PathBuf;
     use super::{from_path, File};
+    use std::path::PathBuf;
 
     #[test]
     fn file_can_be_formatted_as_a_string() {
