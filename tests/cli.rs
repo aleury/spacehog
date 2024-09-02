@@ -1,13 +1,5 @@
 use assert_cmd::Command;
 
-fn normalize_path_separators(output: &str) -> String {
-    if cfg!(windows) {
-        output.replace('/', "\\")
-    } else {
-        output.to_string()
-    }
-}
-
 #[test]
 fn binary_with_version_flag_prints_version() {
     Command::cargo_bin("spacehog")
@@ -49,20 +41,28 @@ fn binary_with_no_args_prints_top_5_largest_files_under_working_directory() {
 
 #[test]
 fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
+    #[cfg(windows)]
     let want = [
-        r"\*\*\* Top 5 largest files \*\*\*",
-        r"\d+ B ./testdata/en/world.txt",
-        r"\d+ B ./testdata/es/mundo.txt",
-        r"\d+ B ./testdata/en/hello.txt",
-        r"\d+ B ./testdata/es/hola.txt",
+        "*** Top 5 largest files ***",
+        "7 B .\\testdata\\en\\world.txt",
+        "6 B .\\testdata\\es\\mundo.txt",
+        "6 B .\\testdata\\en\\hello.txt",
+        "6 B .\\testdata\\es\\hola.txt",
     ];
-    let want_normalized = normalize_path_separators(&want.join("\n"));
+    #[cfg(not(windows))]
+    let want = [
+        "*** Top 5 largest files ***",
+        "7 B ./testdata/en/world.txt",
+        "6 B ./testdata/es/mundo.txt",
+        "6 B ./testdata/en/hello.txt",
+        "5 B ./testdata/es/hola.txt",
+    ];
     Command::cargo_bin("spacehog")
         .unwrap()
         .arg("./testdata")
         .assert()
         .success()
-        .stdout(predicates::str::is_match(want_normalized).unwrap());
+        .stdout(predicates::str::contains(want.join("\n")));
 }
 
 #[test]
