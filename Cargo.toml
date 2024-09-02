@@ -1,6 +1,6 @@
 [package]
 name = "spacehog"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Adam Eury <euryadam@gmail.com>"]
 edition = "2021"
 description = """A simple utility for finding large files on your system."""
