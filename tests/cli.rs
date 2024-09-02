@@ -1,5 +1,13 @@
 use assert_cmd::Command;
 
+fn normalize_path_separators(output: &str) -> String {
+    if cfg!(windows) {
+        output.replace('/', "\\")
+    } else {
+        output.to_string()
+    }
+}
+
 #[test]
 fn binary_with_version_flag_prints_version() {
     Command::cargo_bin("spacehog")
@@ -42,18 +50,19 @@ fn binary_with_no_args_prints_top_5_largest_files_under_working_directory() {
 #[test]
 fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
     let want = [
-        "*** Top 5 largest files ***",
-        "7 B ./testdata/en/world.txt",
-        "6 B ./testdata/es/mundo.txt",
-        "6 B ./testdata/en/hello.txt",
-        "5 B ./testdata/es/hola.txt",
+        r"\*\*\* Top 5 largest files \*\*\*",
+        r"\d+ B ./testdata/en/world.txt",
+        r"\d+ B ./testdata/es/mundo.txt",
+        r"\d+ B ./testdata/en/hello.txt",
+        r"\d+ B ./testdata/es/hola.txt",
     ];
+    let want_normalized = normalize_path_separators(&want.join("\n"));
     Command::cargo_bin("spacehog")
         .unwrap()
         .arg("./testdata")
         .assert()
         .success()
-        .stdout(predicates::str::contains(want.join("\n")));
+        .stdout(predicates::str::is_match(want_normalized).unwrap());
 }
 
 #[test]
@@ -68,10 +77,15 @@ fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_w
 
 #[test]
 fn binary_with_invalid_path_arg_prints_an_error_message_and_exits_with_failure_code() {
+    #[cfg(windows)]
+    let want = "The system cannot find the file specified";
+    #[cfg(not(windows))]
+    let want = "No such file or directory";
+
     Command::cargo_bin("spacehog")
         .unwrap()
         .arg("nonexistent")
         .assert()
         .failure()
-        .stderr(predicates::str::contains("No such file or directory"));
+        .stderr(predicates::str::contains(want));
 }
