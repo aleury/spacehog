@@ -2,7 +2,7 @@ use assert_cmd::Command;
 
 #[test]
 fn binary_with_version_flag_prints_version() {
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .arg("--version")
         .assert()
@@ -12,7 +12,7 @@ fn binary_with_version_flag_prints_version() {
 
 #[test]
 fn binary_with_help_flag_prints_description() {
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .arg("--help")
         .assert()
@@ -22,17 +22,17 @@ fn binary_with_help_flag_prints_description() {
 
 #[test]
 fn binary_with_help_flag_prints_usage() {
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .arg("--help")
         .assert()
         .success()
-        .stdout(predicates::str::contains("Usage: dstats"));
+        .stdout(predicates::str::contains("Usage: spacehog"));
 }
 
 #[test]
 fn binary_with_no_args_prints_top_5_largest_files_under_working_directory() {
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .assert()
         .success()
@@ -48,7 +48,7 @@ fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
         "6 B ./testdata/en/hello.txt",
         "5 B ./testdata/es/hola.txt",
     ];
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .arg("./testdata")
         .assert()
@@ -58,7 +58,7 @@ fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
 
 #[test]
 fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_working_directory() {
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .args(["-n", "10"])
         .assert()
@@ -68,7 +68,7 @@ fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_w
 
 #[test]
 fn binary_with_invalid_path_arg_prints_an_error_message_and_exits_with_failure_code() {
-    Command::cargo_bin("dstats")
+    Command::cargo_bin("spacehog")
         .unwrap()
         .arg("nonexistent")
         .assert()

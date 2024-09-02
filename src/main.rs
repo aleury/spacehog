@@ -15,7 +15,7 @@ fn main() {
     let args = Args::parse();
     let mut sp = Spinner::new(spinners::Dots, "Scanning files...", Color::Blue);
 
-    let results = dstats::find_top_n_largest_files(&args.path, args.number);
+    let results = spacehog::find_top_n_largest_files(&args.path, args.number);
     sp.clear();
 
     match results {
