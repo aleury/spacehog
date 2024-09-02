@@ -15,7 +15,6 @@ exclude = ["/.github/"]
 
 [dependencies]
 clap = { version = "4.5.16", features = ["derive"] }
-humanize-bytes = "1.0.6"
 spinoff = { version = "0.8.0", features = ["dots"] }
 
 [dev-dependencies]

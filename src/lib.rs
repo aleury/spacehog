@@ -1,3 +1,4 @@
+mod bytes;
 mod files;
 
 use std::{collections::BTreeMap, io};
