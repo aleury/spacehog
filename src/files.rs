@@ -3,7 +3,7 @@ use std::fs::ReadDir;
 use std::io;
 use std::path::PathBuf;
 
-use humanize_bytes::humanize_bytes_decimal;
+use crate::bytes;
 
 pub fn from_path(path: &str) -> io::Result<FileIter> {
     let dir = std::fs::read_dir(path)?;
@@ -27,7 +27,7 @@ impl File {
 
 impl Display for File {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.size, self.path.display())
+        write!(f, "{} {}", self.size, self.path.display())
     }
 }
 
@@ -36,7 +36,7 @@ pub struct Size(u64);
 
 impl Display for Size {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:>8}", humanize_bytes_decimal!(self.0))
+        write!(f, "{}", bytes::humanize(self.0))
     }
 }
 
@@ -84,11 +84,11 @@ mod test {
         let cases = vec![
             Case {
                 file: File::new("/path/to/file.txt", 1000),
-                want: "    1 kB: /path/to/file.txt",
+                want: "1 KB /path/to/file.txt",
             },
             Case {
                 file: File::new("/path/to/file.txt", 34250),
-                want: " 34.2 kB: /path/to/file.txt",
+                want: "34 KB /path/to/file.txt",
             },
         ];
         for case in cases {
