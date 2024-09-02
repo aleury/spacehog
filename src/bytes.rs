@@ -52,7 +52,7 @@ mod test {
     use super::humanize;
 
     #[test]
-    fn test_humanize() {
+    fn humanize_returns_bytes_in_a_human_readable_format() {
         assert_eq!(humanize(0), "0 B");
         assert_eq!(humanize(256), "256 B");
         assert_eq!(humanize(512), "512 B");
