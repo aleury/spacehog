@@ -1,22 +1,50 @@
 #![allow(clippy::cast_precision_loss)]
 
-const UNITS: [&str; 6] = ["B", "KB", "MB", "GB", "TB", "PB"];
-
-const BASE: u64 = 1000;
+use std::fmt::Display;
 
 pub fn humanize(bytes: u64) -> String {
-    if bytes < BASE {
-        return format!("{bytes} B");
+    Unit::from(bytes).to_string()
+}
+
+enum Unit {
+    B(u64),
+    KB(f64),
+    MB(f64),
+    GB(f64),
+    TB(f64),
+    PB(f64),
+}
+
+impl Display for Unit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Unit::B(v) => write!(f, "{v} B"),
+            Unit::KB(v) => write!(f, "{v:.0} KB"),
+            Unit::MB(v) => write!(f, "{v:.1} MB"),
+            Unit::GB(v) => write!(f, "{v:.2} GB"),
+            Unit::TB(v) => write!(f, "{v:.2} TB"),
+            Unit::PB(v) => write!(f, "{v:.2} PB"),
+        }
     }
-    let exponent = bytes.ilog10() / BASE.ilog10();
-    let unit = UNITS[exponent as usize];
-    let value = bytes as f64 / BASE.pow(exponent) as f64;
-    let precision = match unit {
-        "KB" => 0,
-        "MB" => 1,
-        _ => 2,
-    };
-    format!("{value:.precision$} {unit}")
+}
+
+impl From<u64> for Unit {
+    fn from(value: u64) -> Self {
+        const BASE: u64 = 1000;
+        if value < BASE {
+            Unit::B(value)
+        } else {
+            let exponent = value.ilog10() / BASE.ilog10();
+            let value = value as f64 / BASE.pow(exponent) as f64;
+            match exponent {
+                1 => Unit::KB(value),
+                2 => Unit::MB(value),
+                3 => Unit::GB(value),
+                4 => Unit::TB(value),
+                _ => Unit::PB(value),
+            }
+        }
+    }
 }
 
 #[cfg(test)]
