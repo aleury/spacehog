@@ -6,6 +6,8 @@ pub fn humanize(bytes: u64) -> String {
     Unit::from(bytes).to_string()
 }
 
+const BASE: u64 = 1_000;
+
 enum Unit {
     B(u64),
     KB(f64),
@@ -30,19 +32,17 @@ impl Display for Unit {
 
 impl From<u64> for Unit {
     fn from(value: u64) -> Self {
-        const BASE: u64 = 1000;
         if value < BASE {
-            Unit::B(value)
-        } else {
-            let exponent = value.ilog10() / BASE.ilog10();
-            let value = value as f64 / BASE.pow(exponent) as f64;
-            match exponent {
-                1 => Unit::KB(value),
-                2 => Unit::MB(value),
-                3 => Unit::GB(value),
-                4 => Unit::TB(value),
-                _ => Unit::PB(value),
-            }
+            return Unit::B(value);
+        }
+        let exponent = value.ilog10() / BASE.ilog10();
+        let value = value as f64 / BASE.pow(exponent) as f64;
+        match exponent {
+            1 => Unit::KB(value),
+            2 => Unit::MB(value),
+            3 => Unit::GB(value),
+            4 => Unit::TB(value),
+            _ => Unit::PB(value),
         }
     }
 }
