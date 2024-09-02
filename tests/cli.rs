@@ -78,7 +78,7 @@ fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_w
 #[test]
 fn binary_with_invalid_path_arg_prints_an_error_message_and_exits_with_failure_code() {
     #[cfg(windows)]
-    let want = "The system cannot find the file specified";
+    let want = "The system cannot find the path specified";
     #[cfg(not(windows))]
     let want = "No such file or directory";
 
