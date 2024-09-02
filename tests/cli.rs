@@ -81,7 +81,6 @@ fn binary_with_invalid_path_arg_prints_an_error_message_and_exits_with_failure_c
     let want = "The system cannot find the path specified";
     #[cfg(not(windows))]
     let want = "No such file or directory";
-
     Command::cargo_bin("spacehog")
         .unwrap()
         .arg("nonexistent")
