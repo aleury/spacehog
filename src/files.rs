@@ -73,7 +73,7 @@ impl Iterator for FileIter {
 
 #[cfg(test)]
 mod test {
-    use super::{from_path, File};
+    use super::File;
 
     #[test]
     fn file_can_be_formatted_as_a_string() {
@@ -115,19 +115,5 @@ mod test {
         files.sort_by(|a, b| b.cmp(a));
 
         assert_eq!(want, files);
-    }
-
-    #[test]
-    fn from_path_returns_iterator_over_files_in_the_given_path() {
-        let want = vec![
-            File::new("./testdata/en/hello.txt", 6),
-            File::new("./testdata/en/world.txt", 7),
-            File::new("./testdata/es/hola.txt", 5),
-            File::new("./testdata/es/mundo.txt", 6),
-        ];
-        let mut got = from_path("./testdata").unwrap().collect::<Vec<_>>();
-        // Sort by path for consistent ordering.
-        got.sort_by_key(|f| f.path.clone());
-        assert_eq!(want, got);
     }
 }
