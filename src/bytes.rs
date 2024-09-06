@@ -1,5 +1,4 @@
 #![allow(clippy::cast_precision_loss)]
-
 use std::fmt::Display;
 
 pub fn humanize(bytes: u64) -> String {
