@@ -6,12 +6,6 @@ on:
       - "README.md"
       - "LICENSE-*"
       - ".gitignore"
-  pull_request:
-    branches: ["main"]
-    paths-ignore:
-      - "README.md"
-      - "LICENSE-*"
-      - ".gitignore"
 env:
   CARGO_TERM_COLOR: always
 
