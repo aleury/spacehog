@@ -30,12 +30,6 @@ pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSiz
 #[derive(Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct FileSize(u64);
 
-impl From<FileSize> for u64 {
-    fn from(size: FileSize) -> Self {
-        size.0
-    }
-}
-
 impl Display for FileSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", bytes::humanize(self.0))
@@ -82,12 +76,6 @@ impl Iterator for FileIter {
 #[cfg(test)]
 mod tests {
     use crate::FileSize;
-
-    #[test]
-    fn file_size_can_convert_into_a_u64() {
-        let size = FileSize(100);
-        assert_eq!(u64::from(size), 100u64);
-    }
 
     #[test]
     fn file_sizes_can_be_formatted_as_a_string() {
