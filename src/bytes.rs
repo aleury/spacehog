@@ -14,6 +14,7 @@ enum Unit {
     GB(f64),
     TB(f64),
     PB(f64),
+    EB(f64),
 }
 
 impl Display for Unit {
@@ -25,6 +26,7 @@ impl Display for Unit {
             Unit::GB(v) => write!(f, "{v:.2} GB"),
             Unit::TB(v) => write!(f, "{v:.2} TB"),
             Unit::PB(v) => write!(f, "{v:.2} PB"),
+            Unit::EB(v) => write!(f, "{v:.2} EB"),
         }
     }
 }
@@ -42,7 +44,7 @@ impl From<u64> for Unit {
             3 => Unit::GB(value),
             4 => Unit::TB(value),
             5 => Unit::PB(value),
-            _ => Unit::PB(value * (BASE as f64)),
+            _ => Unit::EB(value),
         }
     }
 }
@@ -69,8 +71,8 @@ mod test {
         assert_eq!(humanize(50_000_000_000_000), "50.00 TB");
         assert_eq!(humanize(1_421_000_000_000_000), "1.42 PB");
         assert_eq!(humanize(100_421_000_000_000_000), "100.42 PB");
-        assert_eq!(humanize(1_000_421_000_000_000_000), "1000.42 PB");
-        assert_eq!(humanize(2_500_421_000_000_000_000), "2500.42 PB");
-        assert_eq!(humanize(18_446_744_073_709_551_615), "18446.74 PB");
+        assert_eq!(humanize(1_000_421_000_000_000_000), "1.00 EB");
+        assert_eq!(humanize(6_500_421_000_000_000_000), "6.50 EB");
+        assert_eq!(humanize(18_446_744_073_709_551_615), "18.45 EB");
     }
 }
