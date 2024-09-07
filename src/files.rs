@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use crate::bytes;
 
-pub fn from_path(path: &str) -> io::Result<FileIter> {
+pub fn walk_dir(path: &str) -> io::Result<FileIter> {
     let dir = std::fs::read_dir(path)?;
     Ok(FileIter { stack: vec![dir] })
 }
