@@ -54,7 +54,7 @@ mod test {
     use super::humanize;
 
     #[test]
-    fn humanize_returns_bytes_in_a_human_readable_format() {
+    fn humanize_returns_bytes_in_a_human_readable_format_using_si_units() {
         assert_eq!(humanize(0), "0 B");
         assert_eq!(humanize(256), "256 B");
         assert_eq!(humanize(512), "512 B");
