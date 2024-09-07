@@ -45,7 +45,7 @@ mod tests {
     use clap::Parser;
 
     #[test]
-    fn cli_args_can_be_parsed_with_out_panicing() {
+    fn cli_args_can_be_parsed_without_panicing() {
         Args::parse();
     }
 }
