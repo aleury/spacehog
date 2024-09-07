@@ -41,7 +41,8 @@ impl From<u64> for Unit {
             2 => Unit::MB(value),
             3 => Unit::GB(value),
             4 => Unit::TB(value),
-            _ => Unit::PB(value),
+            5 => Unit::PB(value),
+            _ => Unit::PB(value * (BASE as f64)),
         }
     }
 }
@@ -67,5 +68,9 @@ mod test {
         assert_eq!(humanize(200_500_150_001), "200.50 GB");
         assert_eq!(humanize(50_000_000_000_000), "50.00 TB");
         assert_eq!(humanize(1_421_000_000_000_000), "1.42 PB");
+        assert_eq!(humanize(100_421_000_000_000_000), "100.42 PB");
+        assert_eq!(humanize(1_000_421_000_000_000_000), "1000.42 PB");
+        assert_eq!(humanize(2_500_421_000_000_000_000), "2500.42 PB");
+        assert_eq!(humanize(18_446_744_073_709_551_615), "18446.74 PB");
     }
 }
