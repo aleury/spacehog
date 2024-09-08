@@ -12,6 +12,8 @@
 use clap::Parser;
 use spinoff::{spinners, Color, Spinner};
 
+use spacehog::find_top_n_largest_files;
+
 #[derive(Parser, Debug)]
 #[command(version, about)]
 struct Args {
@@ -22,23 +24,28 @@ struct Args {
     number: usize,
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let mut sp = Spinner::new(spinners::Dots, "Scanning files...", Color::Blue);
 
-    let results = spacehog::find_top_n_largest_files(&args.path, args.number);
+    let results = find_top_n_largest_files(&args.path, args.number)?;
     sp.clear();
 
-    match results {
-        Ok(files) => {
-            println!("*** Top {} largest files ***", args.number);
-            for file in files {
-                println!("{file}");
-            }
-        }
-        Err(e) => {
-            eprintln!("{e}");
-            std::process::exit(1);
-        }
+    println!("*** Top {} largest files ***", args.number);
+    for (size, path) in results {
+        println!("{} {}", size, path.display());
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Args;
+    use clap::Parser;
+
+    #[test]
+    fn cli_args_can_be_parsed_without_panicing() {
+        Args::parse();
     }
 }

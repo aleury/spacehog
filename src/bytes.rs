@@ -1,6 +1,7 @@
 #![allow(clippy::cast_precision_loss)]
 use std::fmt::Display;
 
+#[must_use]
 pub fn humanize(bytes: u64) -> String {
     Unit::from(bytes).to_string()
 }
