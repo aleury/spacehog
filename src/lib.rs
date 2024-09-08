@@ -20,7 +20,7 @@ use std::{collections::BTreeMap, fmt::Display, fs::ReadDir, io, path::PathBuf};
 /// ```
 pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSize, PathBuf)>> {
     let mut results = BTreeMap::new();
-    for entry in walk_dir(path)? {
+    for entry in find_files_in_path(path)? {
         results.insert(entry.clone(), entry);
     }
     Ok(results.into_values().rev().take(n).collect())
@@ -36,7 +36,7 @@ impl Display for FileSize {
     }
 }
 
-fn walk_dir(path: &str) -> io::Result<FileIter> {
+fn find_files_in_path(path: &str) -> io::Result<FileIter> {
     let dir = std::fs::read_dir(path)?;
     Ok(FileIter { stack: vec![dir] })
 }
