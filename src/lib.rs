@@ -50,24 +50,18 @@ impl Iterator for FileIter {
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            if let Some(dir) = self.stack.last_mut() {
-                // Explore the current directory.
-                if let Some(entry) = dir.next() {
-                    let entry = entry.ok()?;
-                    let path = entry.path();
-                    if path.is_dir() {
-                        self.stack.push(std::fs::read_dir(path).ok()?);
-                    } else {
-                        let size = entry.metadata().ok()?.len();
-                        return Some((FileSize(size), path));
-                    }
+            let dir = self.stack.last_mut()?;
+            if let Some(entry) = dir.next() {
+                let entry = entry.ok()?;
+                let path = entry.path();
+                if path.is_dir() {
+                    self.stack.push(std::fs::read_dir(path).ok()?);
                 } else {
-                    // No more entries in the current directory.
-                    self.stack.pop();
+                    let size = entry.metadata().ok()?.len();
+                    return Some((FileSize(size), path));
                 }
             } else {
-                // No more directories to explore.
-                return None;
+                self.stack.pop();
             }
         }
     }
