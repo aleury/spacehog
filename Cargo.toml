@@ -21,3 +21,4 @@ spinoff = { version = "0.8.0", features = ["dots"] }
 [dev-dependencies]
 assert_cmd = "2.0.16"
 predicates = "3.1.2"
+tempfile = "3.12.0"

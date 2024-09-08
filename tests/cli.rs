@@ -1,6 +1,7 @@
 use std::io::BufRead;
 
 use assert_cmd::Command;
+use tempfile::TempDir;
 
 #[test]
 fn binary_with_version_flag_prints_version() {
@@ -66,6 +67,17 @@ fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_w
         .assert()
         .success()
         .stdout(predicates::str::contains("*** Top 10 largest files ***"));
+}
+
+#[test]
+fn binary_reports_that_the_directory_is_empty_if_it_contains_zero_files() {
+    let dir = TempDir::new().expect("failed to create temporary directory");
+    Command::cargo_bin("spacehog")
+        .unwrap()
+        .arg(dir.path())
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("The directory is empty."));
 }
 
 #[test]
