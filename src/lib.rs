@@ -1,7 +1,10 @@
 //! Find large files on your system.
 mod bytes;
 
-use std::{collections::BTreeMap, fmt::Display, fs::ReadDir, io, path::PathBuf};
+use std::{
+    collections::BTreeMap, fmt::Display, fs::ReadDir, io, path::PathBuf, sync::mpsc, thread,
+    time::Instant,
+};
 
 /// Returns the top `n` largest files under the provided path.
 ///
@@ -26,9 +29,45 @@ pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSiz
     Ok(results.into_values().rev().take(n).collect())
 }
 
+#[must_use]
+pub fn stream_files_larger_than_min_size(
+    path: &str,
+    limit: usize,
+    minimum: FileSize,
+) -> mpsc::Receiver<Vec<(FileSize, PathBuf)>> {
+    let (tx, rx) = mpsc::sync_channel(10);
+
+    let path = path.to_string();
+    thread::spawn(move || {
+        let mut timer = Instant::now();
+        let mut results = BTreeMap::new();
+        for entry in find_files_in_path(&path).unwrap_or_default() {
+            if entry.0 >= minimum {
+                results.insert(entry.clone(), entry);
+            }
+            if timer.elapsed().as_millis() > 16 {
+                let snapshot: Vec<_> = results.clone().into_values().rev().take(limit).collect();
+                if let Err(e) = tx.send(snapshot) {
+                    println!("failed to send entry: {e:?}");
+                };
+                timer = Instant::now();
+            }
+        }
+        drop(tx);
+    });
+
+    rx
+}
+
 /// The size of a file in bytes.
 #[derive(Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct FileSize(u64);
+
+impl From<u64> for FileSize {
+    fn from(value: u64) -> Self {
+        FileSize(value)
+    }
+}
 
 impl Display for FileSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -41,6 +80,7 @@ fn find_files_in_path(path: &str) -> io::Result<FileIter> {
     Ok(FileIter { stack: vec![dir] })
 }
 
+#[derive(Default)]
 struct FileIter {
     stack: Vec<ReadDir>,
 }

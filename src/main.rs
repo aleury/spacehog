@@ -1,7 +1,8 @@
 use clap::Parser;
-use spinoff::{spinners, Color, Spinner};
+use crossterm::{cursor, terminal, ExecutableCommand, QueueableCommand};
+use std::io::Write;
 
-use spacehog::find_top_n_largest_files;
+use spacehog::stream_files_larger_than_min_size;
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -15,20 +16,23 @@ struct Args {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let mut sp = Spinner::new(spinners::Dots, "Scanning files...", Color::Blue);
+    let mut stdout = std::io::stdout();
+    let stream = stream_files_larger_than_min_size(&args.path, args.number, 10_000.into());
+    while let Ok(results) = stream.recv() {
+        stdout.queue(cursor::SavePosition)?;
+        stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
 
-    let results = find_top_n_largest_files(&args.path, args.number)?;
-    sp.clear();
-
-    if results.is_empty() {
-        println!("No files found.");
-    } else {
-        println!("*** Top {} largest files ***", results.len());
+        let mut buf = Vec::new();
+        writeln!(&mut buf, "*** Top {} largest files ***", results.len())?;
         for (size, path) in results {
-            println!("{} {}", size, path.display());
+            writeln!(&mut buf, "{} {}", size, path.display())?;
         }
-    }
+        stdout.write_all(&buf)?;
 
+        stdout.execute(cursor::RestorePosition)?;
+        stdout.flush()?;
+    }
+    stdout.execute(cursor::MoveDown((args.number + 1) as u16))?;
     Ok(())
 }
 

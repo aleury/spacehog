@@ -16,6 +16,7 @@ exclude = ["/.github/"]
 [dependencies]
 anyhow = "1.0.87"
 clap = { version = "4.5.16", features = ["derive"] }
+crossterm = "0.28.1"
 spinoff = { version = "0.8.0", features = ["dots"] }
 
 [dev-dependencies]
