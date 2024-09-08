@@ -1,14 +1,3 @@
-//! A simple utility for finding large files on your system.
-//!
-//! Usage: spacehog [OPTIONS] [PATH]
-//!
-//! Arguments:
-//!   [PATH]  [default: .]
-//!
-//! Options:
-//!   -n <NUMBER>      [default: 5]
-//!   -h, --help       Print help
-//!   -V, --version    Print version
 use clap::Parser;
 use spinoff::{spinners, Color, Spinner};
 

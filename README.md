@@ -8,31 +8,15 @@
 $ cargo install spacehog
 ```
 
-# Build from source
-
-```
-$ git clone git@github.com:aleury/spacehog.git
-
-$ cd spacehog
-
-$ cargo install --path .
-```
-
 # Usage
 
+From any directory, run:
+
+```sh
+spacehog
 ```
-A simple utility for finding large files on your system.
 
-Usage: spacehog [OPTIONS] [PATH]
-
-Arguments:
-  [PATH]  [default: .]
-
-Options:
-  -n <NUMBER>      [default: 5]
-  -h, --help       Print help
-  -V, --version    Print version
-```
+![Animated demo](img/demo.gif)
 
 ## Examples
 
