@@ -77,7 +77,7 @@ fn binary_reports_that_the_directory_is_empty_if_it_contains_zero_files() {
         .arg(dir.path())
         .assert()
         .success()
-        .stdout(predicates::str::contains("The directory is empty."));
+        .stdout(predicates::str::contains("No files found."));
 }
 
 #[test]

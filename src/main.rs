@@ -21,7 +21,7 @@ fn main() -> anyhow::Result<()> {
     sp.clear();
 
     if results.is_empty() {
-        println!("The directory is empty.");
+        println!("No files found.");
     } else {
         println!("*** Top {} largest files ***", results.len());
         for (size, path) in results {
