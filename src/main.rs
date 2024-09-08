@@ -20,7 +20,7 @@ fn main() -> anyhow::Result<()> {
     let results = find_top_n_largest_files(&args.path, args.number)?;
     sp.clear();
 
-    println!("*** Top {} largest files ***", args.number);
+    println!("*** Top {} largest files ***", results.len());
     for (size, path) in results {
         println!("{} {}", size, path.display());
     }

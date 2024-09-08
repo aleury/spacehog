@@ -42,7 +42,7 @@ fn binary_with_no_args_prints_top_5_largest_files_under_working_directory() {
 }
 
 #[test]
-fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
+fn binary_with_path_arg_prints_the_top_n_largest_files_under_the_given_path() {
     let output = Command::cargo_bin("spacehog")
         .unwrap()
         .arg("./testdata")
@@ -51,7 +51,7 @@ fn binary_with_path_arg_prints_the_top_5_largest_files_under_the_given_path() {
         .get_output()
         .clone();
     let lines: Vec<String> = output.stdout.lines().map_while(Result::ok).collect();
-    assert!(lines[0].contains("*** Top 5 largest files ***"));
+    assert!(lines[0].contains("*** Top 4 largest files ***"));
     assert!(lines[1].ends_with("world.txt"));
     assert!(lines[2].ends_with("mundo.txt"));
     assert!(lines[3].ends_with("hello.txt"));
