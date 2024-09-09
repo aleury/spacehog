@@ -75,7 +75,7 @@ impl<Out: Write> App<Out> {
 
     fn close(&mut self) -> io::Result<()> {
         if self.files.is_empty() {
-            println!("No files found.");
+            writeln!(self.out, "No files found.")?;
         } else {
             let row = self.files.len() + 1;
             self.out.execute(cursor::MoveDown(row as u16))?;
