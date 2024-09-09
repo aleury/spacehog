@@ -57,6 +57,10 @@ pub fn stream_files_larger_than_min_size(
                 timer = Instant::now();
             }
         }
+        let snapshot: Vec<_> = results.clone().into_values().rev().take(limit).collect();
+        if let Err(e) = tx.send(snapshot) {
+            println!("failed to send entry: {e:?}");
+        };
         drop(tx);
     });
 
