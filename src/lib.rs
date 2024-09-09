@@ -29,19 +29,23 @@ pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSiz
     Ok(results.into_values().rev().take(n).collect())
 }
 
-#[must_use]
+/// Stream the top n files larger than a given size.
+///
+/// # Errors
+///
+/// Returns an I/O error if unable to scan the provided path.
 pub fn stream_files_larger_than_min_size(
     path: &str,
     limit: usize,
     minimum: FileSize,
-) -> mpsc::Receiver<Vec<(FileSize, PathBuf)>> {
-    let (tx, rx) = mpsc::sync_channel(10);
-
+) -> io::Result<mpsc::Receiver<Vec<(FileSize, PathBuf)>>> {
     let path = path.to_string();
+    let (tx, rx) = mpsc::channel();
+    let file_iter = find_files_in_path(&path)?;
     thread::spawn(move || {
         let mut timer = Instant::now();
         let mut results = BTreeMap::new();
-        for entry in find_files_in_path(&path).unwrap_or_default() {
+        for entry in file_iter {
             if entry.0 >= minimum {
                 results.insert(entry.clone(), entry);
             }
@@ -56,11 +60,11 @@ pub fn stream_files_larger_than_min_size(
         drop(tx);
     });
 
-    rx
+    Ok(rx)
 }
 
 /// The size of a file in bytes.
-#[derive(Clone, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct FileSize(u64);
 
 impl From<u64> for FileSize {
