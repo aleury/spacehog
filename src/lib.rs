@@ -34,6 +34,18 @@ pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSiz
 /// # Errors
 ///
 /// Returns an I/O error if unable to scan the provided path.
+///
+/// # Examples
+///
+/// ```
+/// use spacehog::stream_files_larger_than_min_size;
+///
+/// let rx = stream_files_larger_than_min_size("testdata", 5, 0.into()).unwrap();
+///
+/// let results = rx.recv().unwrap();
+///
+/// assert_eq!(results.len(), 4);
+/// ```
 pub fn stream_files_larger_than_min_size(
     path: &str,
     limit: usize,
