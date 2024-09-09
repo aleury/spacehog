@@ -23,8 +23,7 @@ struct Args {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let mut stdout = std::io::stdout();
-    let mut app = App::new(&mut stdout);
+    let mut app = App::new(std::io::stdout());
 
     let rx = get_files_with_minimum_size(&args.path, args.number, args.minsize)?;
     while let Ok(results) = rx.recv() {
@@ -38,13 +37,13 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-struct App<'a, Out: Write> {
-    out: &'a mut Out,
+struct App<Out: Write> {
+    out: Out,
     files: Vec<(FileSize, PathBuf)>,
 }
 
-impl<'a, Out: Write> App<'a, Out> {
-    fn new(out: &'a mut Out) -> Self {
+impl<Out: Write> App<Out> {
+    fn new(out: Out) -> Self {
         Self {
             out,
             files: Vec::new(),
