@@ -17,23 +17,31 @@ struct Args {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
+    let mut count = 0;
     let mut stdout = std::io::stdout();
     let stream = stream_files_larger_than_min_size(&args.path, args.number, 1_000_000.into())?;
     while let Ok(results) = stream.recv() {
+        count = results.len();
         stdout.queue(cursor::SavePosition)?;
         stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
 
-        let mut buf = Vec::new();
-        writeln!(&mut buf, "*** Top {} largest files ***", results.len())?;
-        for (size, path) in results {
-            writeln!(&mut buf, "{} {}", size, path.display())?;
+        if !results.is_empty() {
+            let mut buf = Vec::new();
+            writeln!(&mut buf, "*** Top {count} largest files ***")?;
+            for (size, path) in results {
+                writeln!(&mut buf, "{} {}", size, path.display())?;
+            }
+            stdout.write_all(&buf)?;
         }
-        stdout.write_all(&buf)?;
 
         stdout.execute(cursor::RestorePosition)?;
         stdout.flush()?;
     }
-    stdout.execute(cursor::MoveDown((args.number + 1) as u16))?;
+    if count > 0 {
+        stdout.execute(cursor::MoveDown((count + 1) as u16))?;
+    } else {
+        println!("No files found.");
+    }
     Ok(())
 }
 
