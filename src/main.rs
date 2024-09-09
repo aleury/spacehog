@@ -23,20 +23,17 @@ struct Args {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-
     let mut stdout = std::io::stdout();
     let mut app = App::new(&mut stdout);
 
     let rx = get_files_with_minimum_size(&args.path, args.number, args.minsize)?;
     while let Ok(results) = rx.recv() {
-        app.update(results);
-        app.render()?;
+        if !results.is_empty() {
+            app.update(results);
+            app.render()?;
+        }
     }
-    if app.files.is_empty() {
-        println!("No files found.");
-    } else {
-        app.close()?;
-    }
+
     Ok(())
 }
 
@@ -72,11 +69,17 @@ impl<'a, Out: Write> App<'a, Out> {
         self.out.queue(cursor::RestorePosition)?;
         self.out.flush()
     }
+}
 
-    fn close(&mut self) -> io::Result<()> {
-        self.out
-            .execute(cursor::MoveDown((self.files.len() + 1) as u16))?;
-        Ok(())
+impl<'a, Out: Write> Drop for App<'a, Out> {
+    fn drop(&mut self) {
+        if self.files.is_empty() {
+            println!("No files found.");
+        } else {
+            let _ = self
+                .out
+                .execute(cursor::MoveDown((self.files.len() + 1) as u16));
+        }
     }
 }
 
