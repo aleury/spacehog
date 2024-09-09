@@ -33,6 +33,7 @@ fn main() -> anyhow::Result<()> {
             app.render()?;
         }
     }
+    app.close()?;
 
     Ok(())
 }
@@ -69,17 +70,15 @@ impl<'a, Out: Write> App<'a, Out> {
         self.out.queue(cursor::RestorePosition)?;
         self.out.flush()
     }
-}
 
-impl<'a, Out: Write> Drop for App<'a, Out> {
-    fn drop(&mut self) {
+    fn close(&mut self) -> io::Result<()> {
         if self.files.is_empty() {
             println!("No files found.");
         } else {
-            let _ = self
-                .out
-                .execute(cursor::MoveDown((self.files.len() + 1) as u16));
+            self.out
+                .execute(cursor::MoveDown((self.files.len() + 1) as u16))?;
         }
+        Ok(())
     }
 }
 
