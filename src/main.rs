@@ -1,9 +1,12 @@
 #![allow(clippy::cast_possible_truncation)]
 use clap::Parser;
 use crossterm::{cursor, terminal, ExecutableCommand, QueueableCommand};
-use std::io::Write;
+use std::{
+    io::{self, Write},
+    path::PathBuf,
+};
 
-use spacehog::get_files_with_minimum_size;
+use spacehog::{get_files_with_minimum_size, FileSize};
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -20,32 +23,61 @@ struct Args {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let mut count = 0;
+
     let mut stdout = std::io::stdout();
+    let mut app = App::new(&mut stdout);
+
     let rx = get_files_with_minimum_size(&args.path, args.number, args.minsize)?;
     while let Ok(results) = rx.recv() {
-        count = results.len();
-        stdout.queue(cursor::SavePosition)?;
-        stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
-
-        if !results.is_empty() {
-            let mut buf = Vec::new();
-            writeln!(&mut buf, "*** Top {count} largest files ***")?;
-            for (size, path) in results {
-                writeln!(&mut buf, "{} {}", size, path.display())?;
-            }
-            stdout.write_all(&buf)?;
-        }
-
-        stdout.execute(cursor::RestorePosition)?;
-        stdout.flush()?;
+        app.update(results);
+        app.render()?;
     }
-    if count > 0 {
-        stdout.execute(cursor::MoveDown((count + 1) as u16))?;
-    } else {
+    if app.files.is_empty() {
         println!("No files found.");
+    } else {
+        app.close()?;
     }
     Ok(())
+}
+
+struct App<'a, Out: Write> {
+    out: &'a mut Out,
+    files: Vec<(FileSize, PathBuf)>,
+}
+
+impl<'a, Out: Write> App<'a, Out> {
+    fn new(out: &'a mut Out) -> Self {
+        Self {
+            out,
+            files: Vec::new(),
+        }
+    }
+
+    fn update(&mut self, files: Vec<(FileSize, PathBuf)>) {
+        self.files = files;
+    }
+
+    fn render(&mut self) -> io::Result<()> {
+        self.out.queue(cursor::SavePosition)?;
+        self.out
+            .queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
+
+        let mut buf = Vec::new();
+        writeln!(&mut buf, "*** Top {} largest files ***", self.files.len())?;
+        for (size, path) in &self.files {
+            writeln!(&mut buf, "{} {}", size, path.display())?;
+        }
+        self.out.write_all(&buf)?;
+
+        self.out.queue(cursor::RestorePosition)?;
+        self.out.flush()
+    }
+
+    fn close(&mut self) -> io::Result<()> {
+        self.out
+            .execute(cursor::MoveDown((self.files.len() + 1) as u16))?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]
