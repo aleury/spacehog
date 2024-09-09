@@ -1,6 +1,10 @@
 #![allow(clippy::cast_possible_truncation)]
 use clap::Parser;
-use crossterm::{cursor, terminal, ExecutableCommand, QueueableCommand};
+use crossterm::{
+    cursor,
+    terminal::{self, ClearType},
+    ExecutableCommand, QueueableCommand,
+};
 use std::{
     io::{self, Write},
     path::PathBuf,
@@ -56,8 +60,7 @@ impl<Out: Write> App<Out> {
 
     fn render(&mut self) -> io::Result<()> {
         self.out.queue(cursor::SavePosition)?;
-        self.out
-            .queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
+        self.out.queue(terminal::Clear(ClearType::FromCursorDown))?;
 
         let mut buf = Vec::new();
         writeln!(&mut buf, "*** Top {} largest files ***", self.files.len())?;
@@ -74,8 +77,8 @@ impl<Out: Write> App<Out> {
         if self.files.is_empty() {
             println!("No files found.");
         } else {
-            self.out
-                .execute(cursor::MoveDown((self.files.len() + 1) as u16))?;
+            let row = self.files.len() + 1;
+            self.out.execute(cursor::MoveDown(row as u16))?;
         }
         Ok(())
     }
