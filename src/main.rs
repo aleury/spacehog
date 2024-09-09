@@ -3,7 +3,7 @@ use clap::Parser;
 use crossterm::{cursor, terminal, ExecutableCommand, QueueableCommand};
 use std::io::Write;
 
-use spacehog::stream_files_larger_than_min_size;
+use spacehog::get_files_with_minimum_size;
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -22,8 +22,8 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let mut count = 0;
     let mut stdout = std::io::stdout();
-    let stream = stream_files_larger_than_min_size(&args.path, args.number, args.minsize.into())?;
-    while let Ok(results) = stream.recv() {
+    let rx = get_files_with_minimum_size(&args.path, args.number, args.minsize)?;
+    while let Ok(results) = rx.recv() {
         count = results.len();
         stdout.queue(cursor::SavePosition)?;
         stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;

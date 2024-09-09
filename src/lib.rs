@@ -38,22 +38,24 @@ pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSiz
 /// # Examples
 ///
 /// ```
-/// use spacehog::stream_files_larger_than_min_size;
+/// use spacehog::get_files_with_minimum_size;
 ///
-/// let rx = stream_files_larger_than_min_size("testdata", 5, 0.into()).unwrap();
+/// let rx = get_files_with_minimum_size("testdata", 5, 0).unwrap();
 ///
 /// let results = rx.recv().unwrap();
 ///
 /// assert_eq!(results.len(), 4);
 /// ```
-pub fn stream_files_larger_than_min_size(
+pub fn get_files_with_minimum_size(
     path: &str,
     limit: usize,
-    minimum: FileSize,
+    minimum: impl Into<FileSize>,
 ) -> io::Result<mpsc::Receiver<Vec<(FileSize, PathBuf)>>> {
     let path = path.to_string();
+    let minimum = minimum.into();
     let (tx, rx) = mpsc::channel();
     let file_iter = find_files_in_path(&path)?;
+
     thread::spawn(move || {
         let mut timer = Instant::now();
         let mut results = BTreeMap::new();
@@ -62,21 +64,25 @@ pub fn stream_files_larger_than_min_size(
                 results.insert(entry.clone(), entry);
             }
             if timer.elapsed().as_millis() > 16 {
-                let snapshot: Vec<_> = results.clone().into_values().rev().take(limit).collect();
-                if let Err(e) = tx.send(snapshot) {
-                    println!("failed to send entry: {e:?}");
-                };
+                send_snapshot(&tx, &results, limit);
                 timer = Instant::now();
             }
         }
-        let snapshot: Vec<_> = results.clone().into_values().rev().take(limit).collect();
-        if let Err(e) = tx.send(snapshot) {
-            println!("failed to send entry: {e:?}");
-        };
-        drop(tx);
+        send_snapshot(&tx, &results, limit);
     });
 
     Ok(rx)
+}
+
+fn send_snapshot(
+    tx: &mpsc::Sender<Vec<(FileSize, PathBuf)>>,
+    results: &BTreeMap<(FileSize, PathBuf), (FileSize, PathBuf)>,
+    limit: usize,
+) {
+    let snapshot = results.values().rev().take(limit).cloned().collect();
+    if let Err(e) = tx.send(snapshot) {
+        println!("failed to send entry: {e:?}");
+    };
 }
 
 /// The size of a file in bytes.
