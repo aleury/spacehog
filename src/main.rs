@@ -10,7 +10,7 @@ use std::{
     path::PathBuf,
 };
 
-use spacehog::{get_files_with_minimum_size, FileSize};
+use spacehog::{find_top_n_largest_files, FileSize};
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -30,7 +30,7 @@ fn main() -> anyhow::Result<()> {
     let ignore_hidden = !args.hidden;
     let mut app = App::new(std::io::stdout());
 
-    let rx = get_files_with_minimum_size(&args.path, args.number, ignore_hidden)?;
+    let rx = find_top_n_largest_files(&args.path, args.number, ignore_hidden)?;
     while let Ok(results) = rx.recv() {
         if !results.is_empty() {
             app.update(results);

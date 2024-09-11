@@ -18,15 +18,15 @@ use std::time::Instant;
 /// # Examples
 ///
 /// ```
-/// use spacehog::get_files_with_minimum_size;
+/// use spacehog::find_top_n_largest_files;
 ///
-/// let rx = get_files_with_minimum_size("testdata", 5, true).unwrap();
+/// let rx = find_top_n_largest_files("testdata", 5, true).unwrap();
 ///
 /// let results = rx.recv().unwrap();
 ///
 /// assert_eq!(results.len(), 4);
 /// ```
-pub fn get_files_with_minimum_size(
+pub fn find_top_n_largest_files(
     path: &str,
     limit: usize,
     ignore_hidden: bool,
