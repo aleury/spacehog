@@ -1,7 +1,8 @@
-use std::io::BufRead;
+use std::io::Write;
+use std::{fs::File, io::BufRead};
 
 use assert_cmd::Command;
-use tempfile::TempDir;
+use tempfile::{tempdir, tempdir_in, TempDir};
 
 #[test]
 fn binary_with_version_flag_prints_version() {
@@ -78,6 +79,40 @@ fn binary_reports_that_the_directory_is_empty_if_it_contains_zero_files() {
         .assert()
         .success()
         .stdout(predicates::str::contains("No files found."));
+}
+
+#[test]
+fn binary_ignores_hidden_files_and_directories_by_default() {
+    use std::io::Write;
+    let parent_dir = tempdir().expect("failed to create temporary directory");
+    let hidden_dir = tempdir_in(parent_dir.path()).expect("failed to create temporary directory");
+    let temp_file_path = hidden_dir.path().join("test.txt");
+    let mut temp_file = File::create(temp_file_path).expect("failed to create temporary file");
+    write!(temp_file, "hello test").unwrap();
+
+    Command::cargo_bin("spacehog")
+        .unwrap()
+        .arg(parent_dir.path())
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("No files found."));
+}
+
+#[test]
+fn binary_includes_hidden_files_and_directories_when_given_hidden_flag() {
+    let parent_dir = tempdir().expect("failed to create temporary directory");
+    let hidden_dir = tempdir_in(parent_dir.path()).expect("failed to create temporary directory");
+    let temp_file_path = hidden_dir.path().join("test.txt");
+    let mut temp_file = File::create(temp_file_path).expect("failed to create temporary file");
+    write!(temp_file, "hello test").unwrap();
+
+    Command::cargo_bin("spacehog")
+        .unwrap()
+        .arg(parent_dir.path())
+        .arg("--hidden")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("*** Top 1 largest files ***"));
 }
 
 #[test]

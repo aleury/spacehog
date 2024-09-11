@@ -11,13 +11,17 @@ struct Args {
 
     #[arg(short, default_value_t = 5)]
     number: usize,
+
+    #[arg(long, default_value_t = false)]
+    hidden: bool,
 }
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
+    let ignore_hidden = !args.hidden;
     let mut sp = Spinner::new(spinners::Dots, "Scanning files...", Color::Blue);
 
-    let results = find_top_n_largest_files(&args.path, args.number)?;
+    let results = find_top_n_largest_files(&args.path, args.number, ignore_hidden)?;
     sp.clear();
 
     if results.is_empty() {
