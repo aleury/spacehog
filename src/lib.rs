@@ -1,10 +1,13 @@
 //! Find large files on your system.
 mod bytes;
 
-use std::{
-    collections::BTreeMap, fmt::Display, fs::ReadDir, io, path::PathBuf, sync::mpsc, thread,
-    time::Instant,
-};
+use std::collections::BTreeMap;
+use std::fmt::Display;
+use std::fs::ReadDir;
+use std::io;
+use std::path::{Path, PathBuf};
+use std::sync::mpsc;
+use std::time::Instant;
 
 /// Stream the top n files larger than a given size.
 ///
@@ -17,7 +20,7 @@ use std::{
 /// ```
 /// use spacehog::get_files_with_minimum_size;
 ///
-/// let rx = get_files_with_minimum_size("testdata", 5, 0).unwrap();
+/// let rx = get_files_with_minimum_size("testdata", 5, true).unwrap();
 ///
 /// let results = rx.recv().unwrap();
 ///
@@ -26,20 +29,17 @@ use std::{
 pub fn get_files_with_minimum_size(
     path: &str,
     limit: usize,
-    minimum: impl Into<FileSize>,
+    ignore_hidden: bool,
 ) -> io::Result<mpsc::Receiver<Vec<(FileSize, PathBuf)>>> {
     let path = path.to_string();
-    let minimum = minimum.into();
     let (tx, rx) = mpsc::channel();
-    let file_iter = find_files_in_path(&path)?;
+    let file_iter = find_files_in_path(&path, ignore_hidden)?;
 
-    thread::spawn(move || {
+    std::thread::spawn(move || {
         let mut timer = Instant::now();
         let mut results = BTreeMap::new();
         for entry in file_iter {
-            if entry.0 >= minimum {
-                results.insert(entry.clone(), entry);
-            }
+            results.insert(entry.clone(), entry);
             if timer.elapsed().as_millis() > 16 {
                 send_snapshot(&tx, &results, limit);
                 timer = Instant::now();
@@ -78,13 +78,17 @@ impl Display for FileSize {
     }
 }
 
-fn find_files_in_path(path: &str) -> io::Result<FileIter> {
+fn find_files_in_path(path: &str, ignore_hidden: bool) -> io::Result<FileIter> {
     let dir = std::fs::read_dir(path)?;
-    Ok(FileIter { stack: vec![dir] })
+    Ok(FileIter {
+        ignore_hidden,
+        stack: vec![dir],
+    })
 }
 
 #[derive(Default)]
 struct FileIter {
+    ignore_hidden: bool,
     stack: Vec<ReadDir>,
 }
 
@@ -97,6 +101,9 @@ impl Iterator for FileIter {
             if let Some(entry) = dir.next() {
                 let entry = entry.ok()?;
                 let path = entry.path();
+                if self.ignore_hidden && is_hidden_path(&path) {
+                    continue;
+                }
                 if path.is_dir() {
                     self.stack.push(std::fs::read_dir(path).ok()?);
                 } else {
@@ -107,6 +114,14 @@ impl Iterator for FileIter {
                 self.stack.pop();
             }
         }
+    }
+}
+
+fn is_hidden_path<P: AsRef<Path>>(path: P) -> bool {
+    if let Some(name) = path.as_ref().file_name() {
+        name.to_str().map_or(false, |s| s.starts_with('.'))
+    } else {
+        false
     }
 }
 

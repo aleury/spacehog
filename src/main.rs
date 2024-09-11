@@ -21,15 +21,16 @@ struct Args {
     #[arg(short, default_value_t = 5)]
     number: usize,
 
-    #[arg(short, default_value_t = 0)]
-    minsize: u64,
+    #[arg(long, default_value_t = false)]
+    hidden: bool,
 }
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
+    let ignore_hidden = !args.hidden;
     let mut app = App::new(std::io::stdout());
 
-    let rx = get_files_with_minimum_size(&args.path, args.number, args.minsize)?;
+    let rx = get_files_with_minimum_size(&args.path, args.number, ignore_hidden)?;
     while let Ok(results) = rx.recv() {
         if !results.is_empty() {
             app.update(results);
