@@ -66,12 +66,6 @@ fn send_snapshot(
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct FileSize(u64);
 
-impl From<u64> for FileSize {
-    fn from(value: u64) -> Self {
-        FileSize(value)
-    }
-}
-
 impl Display for FileSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", bytes::humanize(self.0))
