@@ -6,29 +6,6 @@ use std::{
     time::Instant,
 };
 
-/// Returns the top `n` largest files under the provided path.
-///
-/// # Errors
-///
-/// Returns an I/O error if unable to scan the provided path.
-///
-/// # Examples
-///
-/// ```
-/// use spacehog::find_top_n_largest_files;
-///
-/// let results = find_top_n_largest_files("testdata", 5).unwrap();
-///
-/// assert_eq!(results.len(), 4);
-/// ```
-pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSize, PathBuf)>> {
-    let mut results = BTreeMap::new();
-    for entry in find_files_in_path(path)? {
-        results.insert(entry.clone(), entry);
-    }
-    Ok(results.into_values().rev().take(n).collect())
-}
-
 /// Stream the top n files larger than a given size.
 ///
 /// # Errors
@@ -81,7 +58,7 @@ fn send_snapshot(
 ) {
     let snapshot = results.values().rev().take(limit).cloned().collect();
     if let Err(e) = tx.send(snapshot) {
-        println!("failed to send entry: {e:?}");
+        eprintln!("failed to send entry: {e:?}");
     };
 }
 

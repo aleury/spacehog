@@ -60,6 +60,16 @@ fn binary_with_path_arg_prints_the_top_n_largest_files_under_the_given_path() {
 }
 
 #[test]
+fn binary_with_minimum_file_size_arg_filters_out_files_of_smaller_size() {
+    Command::cargo_bin("spacehog")
+        .unwrap()
+        .args(["./testdata", "-m", "10"])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("No files found."));
+}
+
+#[test]
 fn binary_with_the_number_arg_prints_the_top_n_largest_files_under_the_current_working_directory() {
     Command::cargo_bin("spacehog")
         .unwrap()
