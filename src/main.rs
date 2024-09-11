@@ -119,6 +119,6 @@ mod tests {
         app.close().unwrap();
 
         let output_str = String::from_utf8(output).unwrap();
-        assert!(output_str.contains("\x1B[3B"));
+        assert!(output_str.ends_with("\x1B[3B"));
     }
 }
