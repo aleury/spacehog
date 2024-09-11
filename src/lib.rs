@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use std::time::Instant;
 
-/// Stream the top n largest files under the provided path.
+/// Stream the top `n` largest files under the provided path.
 ///
 /// # Errors
 ///
