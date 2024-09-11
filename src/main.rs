@@ -87,11 +87,38 @@ impl<Out: Write> App<Out> {
 
 #[cfg(test)]
 mod tests {
-    use super::Args;
+    use super::{App, Args};
     use clap::Parser;
+    use std::path::PathBuf;
 
     #[test]
     fn cli_args_can_be_parsed_without_panicing() {
         Args::parse();
+    }
+
+    #[test]
+    fn test_close_with_no_files() {
+        let mut output = Vec::new();
+        let mut app = App::new(&mut output);
+
+        app.close().unwrap();
+
+        let output_str = String::from_utf8(output).unwrap();
+        assert_eq!(output_str, "No files found.\n");
+    }
+
+    #[test]
+    fn test_close_with_files_moves_cursor_to_row_after_last_file() {
+        let mut output = Vec::new();
+        let mut app = App::new(&mut output);
+
+        app.update(vec![
+            (2048.into(), PathBuf::from("file1.txt")),
+            (1024.into(), PathBuf::from("file2.txt")),
+        ]);
+        app.close().unwrap();
+
+        let output_str = String::from_utf8(output).unwrap();
+        assert!(output_str.contains("\x1B[3B"));
     }
 }

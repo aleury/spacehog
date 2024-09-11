@@ -40,7 +40,7 @@ pub fn find_top_n_largest_files(
         let mut results = BTreeMap::new();
         for entry in file_iter {
             results.insert(entry.clone(), entry);
-            if timer.elapsed().as_millis() > 16 {
+            if timer.elapsed().as_millis() >= 16 {
                 send_snapshot(&tx, &results, limit);
                 timer = Instant::now();
             }
@@ -65,6 +65,12 @@ fn send_snapshot(
 /// The size of a file in bytes.
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct FileSize(u64);
+
+impl From<u64> for FileSize {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
 
 impl Display for FileSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
