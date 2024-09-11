@@ -22,6 +22,7 @@ struct Args {
     number: usize,
 
     #[arg(long, default_value_t = false)]
+    #[arg(help = "Include hidden files and directories")]
     hidden: bool,
 }
 
