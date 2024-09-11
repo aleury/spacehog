@@ -1,7 +1,13 @@
 //! Find large files on your system.
 mod bytes;
 
-use std::{collections::BTreeMap, fmt::Display, fs::ReadDir, io, path::PathBuf};
+use std::{
+    collections::BTreeMap,
+    fmt::Display,
+    fs::ReadDir,
+    io,
+    path::{Path, PathBuf},
+};
 
 /// Returns the top `n` largest files under the provided path.
 ///
@@ -14,13 +20,17 @@ use std::{collections::BTreeMap, fmt::Display, fs::ReadDir, io, path::PathBuf};
 /// ```
 /// use spacehog::find_top_n_largest_files;
 ///
-/// let results = find_top_n_largest_files("testdata", 5).unwrap();
+/// let results = find_top_n_largest_files("testdata", 5, false).unwrap();
 ///
 /// assert_eq!(results.len(), 4);
 /// ```
-pub fn find_top_n_largest_files(path: &str, n: usize) -> io::Result<Vec<(FileSize, PathBuf)>> {
+pub fn find_top_n_largest_files(
+    path: &str,
+    n: usize,
+    ignore_hidden: bool,
+) -> io::Result<Vec<(FileSize, PathBuf)>> {
     let mut results = BTreeMap::new();
-    for entry in find_files_in_path(path)? {
+    for entry in find_files_in_path(path, ignore_hidden)? {
         results.insert(entry.clone(), entry);
     }
     Ok(results.into_values().rev().take(n).collect())
@@ -36,12 +46,16 @@ impl Display for FileSize {
     }
 }
 
-fn find_files_in_path(path: &str) -> io::Result<FileIter> {
+fn find_files_in_path(path: &str, ignore_hidden: bool) -> io::Result<FileIter> {
     let dir = std::fs::read_dir(path)?;
-    Ok(FileIter { stack: vec![dir] })
+    Ok(FileIter {
+        ignore_hidden,
+        stack: vec![dir],
+    })
 }
 
 struct FileIter {
+    ignore_hidden: bool,
     stack: Vec<ReadDir>,
 }
 
@@ -54,6 +68,9 @@ impl Iterator for FileIter {
             if let Some(entry) = dir.next() {
                 let entry = entry.ok()?;
                 let path = entry.path();
+                if self.ignore_hidden && is_hidden_path(&path) {
+                    continue;
+                }
                 if path.is_dir() {
                     self.stack.push(std::fs::read_dir(path).ok()?);
                 } else {
@@ -64,6 +81,14 @@ impl Iterator for FileIter {
                 self.stack.pop();
             }
         }
+    }
+}
+
+fn is_hidden_path<P: AsRef<Path>>(path: P) -> bool {
+    if let Some(name) = path.as_ref().file_name() {
+        name.to_str().map_or(false, |s| s.starts_with('.'))
+    } else {
+        false
     }
 }
 
