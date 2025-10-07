@@ -2,7 +2,7 @@ use std::io::Write;
 use std::{fs::File, io::BufRead};
 
 use assert_cmd::Command;
-use tempfile::{tempdir, tempdir_in, TempDir};
+use tempfile::{TempDir, tempdir, tempdir_in};
 
 #[test]
 fn binary_with_version_flag_prints_version() {

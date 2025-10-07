@@ -59,7 +59,7 @@ fn send_snapshot(
     let snapshot = results.values().rev().take(limit).cloned().collect();
     if let Err(e) = tx.send(snapshot) {
         eprintln!("failed to send entry: {e:?}");
-    };
+    }
 }
 
 /// The size of a file in bytes.
@@ -119,7 +119,7 @@ impl Iterator for FileIter {
 
 fn is_hidden_path<P: AsRef<Path>>(path: P) -> bool {
     if let Some(name) = path.as_ref().file_name() {
-        name.to_str().map_or(false, |s| s.starts_with('.'))
+        name.to_str().is_some_and(|s| s.starts_with('.'))
     } else {
         false
     }

@@ -1,16 +1,15 @@
 #![allow(clippy::cast_possible_truncation)]
 use clap::Parser;
 use crossterm::{
-    cursor,
+    ExecutableCommand, QueueableCommand, cursor,
     terminal::{self, ClearType},
-    ExecutableCommand, QueueableCommand,
 };
 use std::{
     io::{self, Write},
     path::PathBuf,
 };
 
-use spacehog::{find_top_n_largest_files, FileSize};
+use spacehog::{FileSize, find_top_n_largest_files};
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
