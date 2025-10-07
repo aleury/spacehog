@@ -2,7 +2,7 @@
 name = "spacehog"
 version = "0.1.7"
 authors = ["Adam Eury <euryadam@gmail.com>"]
-edition = "2021"
+edition = "2024"
 description = """A simple utility for finding large files on your system."""
 keywords = ["disk", "space", "usage", "large", "files"]
 categories = ["command-line-utilities"]
@@ -14,9 +14,9 @@ repository = "https://github.com/aleury/spacehog"
 exclude = ["/.github/"]
 
 [dependencies]
-anyhow = "1.0.87"
-clap = { version = "4.5.16", features = ["derive"] }
-crossterm = "0.28.1"
+anyhow = "1.0"
+clap = { version = "4.5.48", features = ["derive"] }
+crossterm = "0.29"
 
 [dev-dependencies]
 assert_cmd = "2.0.16"
